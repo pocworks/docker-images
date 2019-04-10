@@ -21,7 +21,7 @@ RUN SIG=42970487e3af4f5aa5bca3f542482c60 && \
         | tar -xzf - -C /usr/lib/jvm/ && \
     curl -jksSLH "Cookie: oraclelicense=accept-securebackup-cookie" \
     http://download.oracle.com/otn-pub/java/jce/${JAVA_VERSION_MAJOR}/jce_policy-${JAVA_VERSION_MAJOR}.zip \
-        | bsdtar -xvf - -C ${JAVA_HOME}/lib/security/  --strip-components=1 && \
+        | bsdtar -xvf - -C ${JAVA_HOME}/lib/security/ --strip-components=1 && \
     rm -rf  ${JAVA_HOME}/lib/plugin.jar \
             ${JAVA_HOME}/lib/ext/jfxrt.jar \
             ${JAVA_HOME}/bin/javaws \
