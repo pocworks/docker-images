@@ -19,5 +19,5 @@ RUN mkdir -p $CATALINA_HOME && \
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
 
-RUN apt-get -y autoremove curl && apt-get autoclean && \
+RUN apt-get autoclean && \
     rm -rf /var/cache/apt /var/lib/apt/lists/* /tmp/* /var/tmp/*

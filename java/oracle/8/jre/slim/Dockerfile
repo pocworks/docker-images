@@ -39,5 +39,5 @@ RUN SIG=42970487e3af4f5aa5bca3f542482c60 && \
             ${JAVA_HOME}/lib/amd64/libjavafx*.so \
             ${JAVA_HOME}/lib/amd64/libjfx*.so
     
-RUN apt-get -y autoremove curl bsdtar && apt-get autoclean && \
+RUN apt-get -y autoremove bsdtar && apt-get autoclean && \
     rm -rf /var/cache/apt /var/lib/apt/lists/* /tmp/* /var/tmp/* 
