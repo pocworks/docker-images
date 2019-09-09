@@ -1,4 +1,4 @@
-# Based on https://hub.docker.com/r/jrottenberg/ffmpeg/
+# Based on https://github.com/jrottenberg/ffmpeg
 # Copy all ffmpeg and related libs to openjdk:11.0.4-jre-stretch
 
 FROM buildpack-deps:stretch-curl AS base
