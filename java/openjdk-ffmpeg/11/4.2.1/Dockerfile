@@ -23,6 +23,7 @@ ENV FFMPEG_VERSION=4.2.1 \
     X264_VERSION=20170226-2245-stable \
     X265_VERSION=3.1.1 \
     XVID_VERSION=1.3.4 \
+    LAME_VERSION=3.100 \
     SRC=/usr/local
 
 RUN buildDeps="autoconf \
@@ -51,7 +52,7 @@ RUN buildDeps="autoconf \
 RUN DIR=/tmp/x264 && \
     mkdir -p ${DIR} && \
     cd ${DIR} && \
-    curl -sL https://download.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-${X264_VERSION}.tar.bz2 | \
+    curl -sLk https://download.videolan.org/pub/videolan/x264/snapshots/x264-snapshot-${X264_VERSION}.tar.bz2 | \
     tar -jx --strip-components=1 && \
     ./configure --prefix="${PREFIX}" --enable-shared --enable-pic --disable-cli && \
     make && \
@@ -62,7 +63,7 @@ RUN DIR=/tmp/x264 && \
 RUN DIR=/tmp/x265 && \
     mkdir -p ${DIR} && \
     cd ${DIR} && \
-    curl -sL https://download.videolan.org/pub/videolan/x265/x265_${X265_VERSION}.tar.gz  | \
+    curl -sLk https://download.videolan.org/pub/videolan/x265/x265_${X265_VERSION}.tar.gz  | \
     tar -zx && \
     cd x265_${X265_VERSION}/build/linux && \
     sed -i "/-DEXTRA_LIB/ s/$/ -DCMAKE_INSTALL_PREFIX=\${PREFIX}/" multilib.sh && \
@@ -75,7 +76,7 @@ RUN DIR=/tmp/x265 && \
 RUN DIR=/tmp/vpx && \
     mkdir -p ${DIR} && \
     cd ${DIR} && \
-    curl -sL https://codeload.github.com/webmproject/libvpx/tar.gz/v${VPX_VERSION} | \
+    curl -sLk https://codeload.github.com/webmproject/libvpx/tar.gz/v${VPX_VERSION} | \
     tar -zx --strip-components=1 && \
     ./configure --prefix="${PREFIX}" --enable-vp8 --enable-vp9 --enable-vp9-highbitdepth --enable-pic --enable-shared \
     --disable-debug --disable-examples --disable-docs --disable-install-bins  && \
@@ -95,9 +96,20 @@ RUN DIR=/tmp/xvid && \
     make install && \
     rm -rf ${DIR}
 
+### libmp3lame http://lame.sourceforge.net/
+RUN DIR=/tmp/lame && \
+    mkdir -p ${DIR} && \
+    cd ${DIR} && \
+    curl -sLk https://versaweb.dl.sourceforge.net/project/lame/lame/$(echo ${LAME_VERSION} | sed -e 's/[^0-9]*\([0-9]*\)[.]\([0-9]*\)[.]\([0-9]*\)\([0-9A-Za-z-]*\)/\1.\2/')/lame-${LAME_VERSION}.tar.gz | \
+    tar -zx --strip-components=1 && \
+    ./configure --prefix="${PREFIX}" --bindir="${PREFIX}/bin" --enable-shared --enable-nasm --enable-pic --disable-frontend && \
+    make && \
+    make install && \
+    rm -rf ${DIR}
+
 # aom https://aomedia.googlesource.com/aom
 RUN DIR=/tmp/aom && \
-    git clone --branch ${AOM_VERSION} --depth 1 https://aomedia.googlesource.com/aom ${DIR} ; \
+    GIT_SSL_NO_VERIFY=true git clone --branch ${AOM_VERSION} --depth 1 https://aomedia.googlesource.com/aom ${DIR} ; \
     cd ${DIR} ; \
     rm -rf CMakeCache.txt CMakeFiles ; \
     mkdir -p ./aom_build ; \
@@ -109,7 +121,7 @@ RUN DIR=/tmp/aom && \
 
 # ffmpeg https://ffmpeg.org/
 RUN DIR=/tmp/ffmpeg && mkdir -p ${DIR} && cd ${DIR} && \
-    curl -sLO https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.bz2 && \
+    curl -sLkO https://ffmpeg.org/releases/ffmpeg-${FFMPEG_VERSION}.tar.bz2 && \
     tar -jx --strip-components=1 -f ffmpeg-${FFMPEG_VERSION}.tar.bz2
 
 # configure, make, make install
@@ -125,6 +137,7 @@ RUN DIR=/tmp/ffmpeg && mkdir -p ${DIR} && cd ${DIR} && \
     --enable-libx265 \
     --enable-libxvid \
     --enable-libx264 \
+    --enable-libmp3lame \
     --enable-nonfree \
     --enable-openssl \
     --enable-libaom --extra-libs=-lpthread \
